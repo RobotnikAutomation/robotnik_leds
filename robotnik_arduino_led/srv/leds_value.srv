@@ -1,0 +1,12 @@
+char mode
+int32 ledStart
+int32 ledEnd
+int32 white
+int32 red
+int32 green
+int32 blue
+int32 msgDefault
+---
+bool error
+string msg
+int32 leds
