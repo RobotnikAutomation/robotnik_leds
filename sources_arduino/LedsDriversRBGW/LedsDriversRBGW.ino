@@ -32,6 +32,16 @@ boolean intermitente;
 boolean mensajenuevo;
 int leds;
 
+int stateACK;
+#define ACK_WAIT 0
+#define ACK_OK 1
+#define ACK_ERROR 2
+
+#define TIMER_ERROR_ACK 5000
+unsigned long time;
+unsigned long last_time;
+
+
 void setup (){
   Serial.begin(9600);
   Serial.setTimeout(100);
@@ -41,18 +51,18 @@ void setup (){
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
   intermitente = true;
-  menStand = WAITI;
+  menStand = NONE;
+  stateACK = 0;
+  time = last_time = millis();
 }
 
 void loop(){
   MenuReader();
   Mensajes();
+  ACKState();
 }
 
 char CharReadingWait (){
-  /*while (!Serial.available()){
-    //delay(1);
-  }*/
   Serial.flush();
   return Serial.read();
 }
@@ -87,17 +97,23 @@ int IntReadingWaitAtoi (){
   return 0;
 }
 
+//Menu reader
 boolean MenuReader(){
   if(Serial.available()>0){
+    if(stateACK!=ACK_OK){
+      stateACK = ACK_OK;
+      menStand = NONE;
+    }
+    time = last_time = millis();
     int p, pend, paux1, paux2;
     int r, g, b, w;
     boolean jump;
     switch (Serial.read()){
-      case 'i':
+      case 'i': //Get information about number of leds
       case 'I':
         Serial.println(leds);
         break;
-      case 'c':
+      case 'c': //Set number of leds
       case 'C':
         leds = IntReadingWaitAtoi();
         leds = leds%LEDS;
@@ -105,7 +121,7 @@ boolean MenuReader(){
         strip.begin();
         strip.show();
         break;
-      case 'p':
+      case 'p': //Change color to a led
       case 'P':
         menStand = NONE;
         mensajenuevo = false;
@@ -123,7 +139,7 @@ boolean MenuReader(){
         strip.show();
         
         break;
-     case 'z':
+     case 'z': //Change color to a zone of leds
      case 'Z':
         menStand = NONE;
         mensajenuevo = false;
@@ -142,7 +158,12 @@ boolean MenuReader(){
         w>255?w=255:w=w;
         colorWipe (strip.Color(r,b,w,g), p, pend);
         break;
-     case 'a':
+     case 'k':
+     case 'K':
+        Serial.println("k");
+        //Type message ACK
+        break;
+     case 'a': //Change color to all leds
      case 'A':
         menStand = NONE;
         mensajenuevo = false;
@@ -156,28 +177,28 @@ boolean MenuReader(){
         w>255?w=255:w=w;
         colorWipe (strip.Color(r,b,w,g), 0, leds);
         break;
-     case 'm':
+     case 'm': //Predeterminate messages
      case 'M':
        switch(IntReadingWaitAtoi()){
-         case NONE:
+         case NONE: //Clear all leds
            menStand = NONE;
            break;
-         case ERR:
+         case ERR: //Red
            menStand = ERR;
            break;
-         case ERRI:
+         case ERRI: //Blinking Red
            menStand = ERRI;
            break;
-         case OK:
+         case OK:  //Green
            menStand = OK;
            break;
-         case OKI:
+         case OKI:  //Blinking Green
            menStand = OKI;
            break;
-         case WAIT:
+         case WAIT:  //Blue
            menStand = WAIT;
            break;
-         case WAITI:
+         case WAITI:  //Blinking Blue
            menStand = WAITI;
            break;
          
@@ -191,6 +212,8 @@ boolean MenuReader(){
   return false;
 }
 
+
+//Print Color from a led to other led
 void colorWipe(uint32_t c, int pfirst, int pend) {
   boolean jump=false;
   if (pend < pfirst){
@@ -212,6 +235,25 @@ void colorWipe(uint32_t c, int pfirst, int pend) {
   strip.show();
 }
 
+//ACK state
+void ACKState(){
+  if(stateACK!=ACK_WAIT){
+    time = millis();
+    if((time-last_time)>TIMER_ERROR_ACK){
+      stateACK = ACK_ERROR;
+    }
+  }
+  switch (stateACK){
+    case ACK_WAIT:
+      menStand = WAITI;
+      break;
+    case ACK_ERROR:
+      menStand = ERRI;
+      break;
+  }
+}
+
+//Paint message predeterminate 
 void Mensajes(){
   switch(menStand){
          case NONE:

@@ -6,11 +6,12 @@ robotnik_led_service::robotnik_led_service(ros::NodeHandle h) : RComponent(h), n
     connected = false;
     try_connect = 0;
     rosReadParams();
+    sendMsg = false;
 }
 
 robotnik_led_service::~robotnik_led_service(){
     if(conexion!=NULL){
-        sendMess("m0.");
+        sendMess("m6.");
         delete conexion;
     }
 }
@@ -21,11 +22,21 @@ int robotnik_led_service::rosSetup(){
     //RobotGoToService   =pnh_.advertiseService("go_to",&robotnik_leds::go_toCB,this);
     ROS_WARN_STREAM("Service start");
     service_led = pnh_.advertiseService(service_led_name, &robotnik_led_service::serviceMsg, this);
+	timer = pnh_.createTimer(ros::Duration(1), &robotnik_led_service::timerPublish, this);
+}
 
+void robotnik_led_service::messageACK(){
+	if (connected){
+		sendMess("k");
+		//sendMess("m1.");
+	}
 }
 
 void robotnik_led_service::timerPublish(const ros::TimerEvent& event){
-    rosPublish();
+	if(!sendMsg){
+		messageACK();
+	}
+    //rosPublish();
 }
 
 bool robotnik_led_service::serviceMsg (robotnik_leds::leds_value::Request  &req, robotnik_leds::leds_value::Response &res){
@@ -35,6 +46,7 @@ bool robotnik_led_service::serviceMsg (robotnik_leds::leds_value::Request  &req,
         switchToState(robotnik_msgs::State::FAILURE_STATE);
         return true;
     }
+    sendMsg = true;
     //conexion->Flush();
      //ROS_INFO_STREAM("----Recived one msg ---");
     switch(req.mode){
@@ -166,6 +178,8 @@ bool robotnik_led_service::serviceMsg (robotnik_leds::leds_value::Request  &req,
             res.msg = "Option not disponse";
             break;
     }
+    
+    sendMsg = false;
     //conexion->Flush();
     if (!connected){
         res.msg = "Not is possible connect with the leds";

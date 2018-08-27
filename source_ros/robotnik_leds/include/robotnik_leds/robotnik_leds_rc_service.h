@@ -60,6 +60,7 @@ protected:
   unsigned int microseconds = 9000;
   bool connected;
   int try_connect;
+  bool sendMsg;
 
   //! Public node handle, to receive data
   ros::NodeHandle nh_;
@@ -70,7 +71,8 @@ protected:
   ros::Timer timer;
   ros::ServiceServer service_led;
   SerialDevice * conexion;
-
+  
+  void messageACK();
   void timerPublish(const ros::TimerEvent& event);
   bool serviceMsg (robotnik_leds::leds_value::Request  &req, robotnik_leds::leds_value::Response &res);
   bool sendMess (char * c, int l);
