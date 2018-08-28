@@ -17,7 +17,7 @@ int robotnik_led_string::rosSetup(){
     //RobotGoToService   =pnh_.advertiseService("go_to",&robotnik_leds::go_toCB,this);
 
     timer  = pnh_.createTimer(ros::Duration(0.00001), &robotnik_led_string::timerPublish, this);
-    client_led = pnh_.serviceClient<robotnik_leds::leds_value>(service_led_name);
+    client_led = nh_.serviceClient<robotnik_leds::leds_value>(service_led_name);
     direction = nh_.subscribe(topic_direction, 1, &robotnik_led_string::directionCallback, this);
     elevator = nh_.subscribe(topic_elevator, 1, &robotnik_led_string::elevatorAction, this);
 
@@ -194,21 +194,21 @@ void robotnik_led_string::rosReadParams(){
     float porc_min_linear_y;
     float porc_min_angular_z;
     int leds;
-    nh_.param<string>("service_name", service_led_name, "server_led_com");
+    pnh_.param<string>("service_name", service_led_name, "server_led_com");
 
-    nh_.param<string>("topic_direction", topic_direction, "robotnik_base_control/cmd_vel");
-    nh_.param<string>("topic_elevator", topic_elevator, "robotnik_base_control/elevator_status");
-    nh_.param<float>("max_value_lineal_x", max_value_lineal_x, 1.0);
-    nh_.param<float>("max_value_lineal_y", max_value_lineal_y, 1.0);
-    nh_.param<float>("max_value_angular_z", max_value_angular_z, 3.0);
-    nh_.param<float>("porc_min_linear_x", porc_min_linear_x, 0.01);
-    nh_.param<float>("porc_min_linear_y", porc_min_linear_y, 0.25);
-    nh_.param<float>("porc_min_angular_z", porc_min_angular_z, 0.25);
-    min_value_activation_x = max_value_lineal_x * porc_min_linear_x;
-    min_value_activation_y = max_value_lineal_y * porc_min_linear_y;
-    min_value_activation_z = max_value_angular_z * porc_min_angular_z;
+    pnh_.param<string>("topic_direction", topic_direction, "robotnik_base_control/cmd_vel");
+    pnh_.param<string>("topic_elevator", topic_elevator, "robotnik_base_control/elevator_status");
+    pnh_.param<float>("max_value_lineal_x", max_value_lineal_x, 1.0);
+    pnh_.param<float>("max_value_lineal_y", max_value_lineal_y, 1.0);
+    pnh_.param<float>("max_value_angular_z", max_value_angular_z, 3.0);
+    pnh_.param<float>("porc_min_linear_x", porc_min_linear_x, 0.01);
+    pnh_.param<float>("porc_min_linear_y", porc_min_linear_y, 0.25);
+    pnh_.param<float>("porc_min_angular_z", porc_min_angular_z, 0.25);
+    min_value_activation_x = 0; //max_value_lineal_x * porc_min_linear_x;
+    min_value_activation_y = 0; //max_value_lineal_y * porc_min_linear_y;
+    min_value_activation_z = 0; //max_value_angular_z * porc_min_angular_z;
 
-    nh_.param<int>("leds", leds, 120);
+    pnh_.param<int>("leds", leds, 120);
     leds_effects= LedsEffects(leds, 5);
 
     string msgRos = "Params: \n service_led_name - " + service_led_name + "\n topic_direction - " + topic_direction
@@ -219,44 +219,44 @@ void robotnik_led_string::rosReadParams(){
     ROS_INFO_STREAM(msgRos);
     int led_start, led_end;
 
-    nh_.param<int>("led_start_front", led_start, 0);
-    nh_.param<int>("led_end_front", led_end, leds/4);
+    pnh_.param<int>("led_start_front", led_start, 0);
+    pnh_.param<int>("led_end_front", led_end, leds/4);
     cout << "F: " << led_start << " " << led_end << endl;
     leds_effects.insertPart(TYPE_PART::front, led_start, led_end, TYPE_COLOR::green);
 
 
-    nh_.param<int>("led_start_left", led_start, leds/4);
-    nh_.param<int>("led_end_left", led_end, 2*(leds/4));
+    pnh_.param<int>("led_start_left", led_start, leds/4);
+    pnh_.param<int>("led_end_left", led_end, 2*(leds/4));
     cout << "L: " << led_start << " " << led_end << endl;
     leds_effects.insertPart(TYPE_PART::left, led_start, led_end, TYPE_COLOR::green);
 
-    nh_.param<int>("led_start_back", led_start, 2*(leds/4));
-    nh_.param<int>("led_end_back", led_end, 3*(leds/4));
+    pnh_.param<int>("led_start_back", led_start, 2*(leds/4));
+    pnh_.param<int>("led_end_back", led_end, 3*(leds/4));
     cout << "B: " << led_start << " " << led_end << endl;
     leds_effects.insertPart(TYPE_PART::back, led_start, led_end, TYPE_COLOR::green);
 
-    nh_.param<int>("led_start_right", led_start, 3*(leds/4));
-    nh_.param<int>("led_end_right", led_end, leds);
+    pnh_.param<int>("led_start_right", led_start, 3*(leds/4));
+    pnh_.param<int>("led_end_right", led_end, leds);
     cout << "R: " << led_start << " " << led_end << endl;
     leds_effects.insertPart(TYPE_PART::right, led_start, led_end, TYPE_COLOR::green);
 
-    nh_.param<int>("led_start_front_left", led_start, ((7*(leds/8)-7))%leds);
-    nh_.param<int>("led_end_front_left", led_end, (((leds/8)-7))%leds);
+    pnh_.param<int>("led_start_front_left", led_start, ((7*(leds/8)-7))%leds);
+    pnh_.param<int>("led_end_front_left", led_end, (((leds/8)-7))%leds);
     cout << "F-L: " << led_start << " " << led_end << endl;
     leds_effects.insertPart(TYPE_PART::front_left, led_start, led_end, TYPE_COLOR::green);
 
-    nh_.param<int>("led_start_front_right", led_start, ((2*(leds/8)-7))%leds);
-    nh_.param<int>("led_end_front_right", led_end, ((3*(leds/8)-7))%leds);
+    pnh_.param<int>("led_start_front_right", led_start, ((2*(leds/8)-7))%leds);
+    pnh_.param<int>("led_end_front_right", led_end, ((3*(leds/8)-7))%leds);
     cout << "F-R: " << led_start << " " << led_end << endl;
     leds_effects.insertPart(TYPE_PART::front_right, led_start, led_end, TYPE_COLOR::green);
 
-    nh_.param<int>("led_start_back_right", led_start, ((4*(leds/8)-7))%leds);
-    nh_.param<int>("led_end_back_right", led_end, ((5*(leds/8)-7))%leds);
+    pnh_.param<int>("led_start_back_right", led_start, ((4*(leds/8)-7))%leds);
+    pnh_.param<int>("led_end_back_right", led_end, ((5*(leds/8)-7))%leds);
     cout << "B-R: " << led_start << " " << led_end << endl;
     leds_effects.insertPart(TYPE_PART::back_right, led_start, led_end, TYPE_COLOR::green);
 
-    nh_.param<int>("led_start_back_left", led_start, ((6*(leds/8)-7))%leds);
-    nh_.param<int>("led_end_back_left", led_end, ((7*(leds/8)-7))%leds);
+    pnh_.param<int>("led_start_back_left", led_start, ((6*(leds/8)-7))%leds);
+    pnh_.param<int>("led_end_back_left", led_end, ((7*(leds/8)-7))%leds);
     cout << "B-L: " << led_start << " " << led_end << endl;
     leds_effects.insertPart(TYPE_PART::back_left, led_start, led_end, TYPE_COLOR::green);
 
