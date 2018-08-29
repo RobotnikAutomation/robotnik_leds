@@ -538,7 +538,7 @@ vector <robotnik_leds::leds_value> LedsEffects::paint(bool increment_clock){
         cleaner = false;
     }
     if(isActivePart(TYPE_PART::all)){
-        cout << "Parte all activa" << endl;
+        //cout << "Parte all activa" << endl;
         return callEffect(TYPE_PART::all);
     }else{
         for(map<TYPE_PART, LedsPart>::iterator it = parts.begin(); it != parts.end(); ++it){

@@ -3,7 +3,8 @@
 robotnik_led_string::robotnik_led_string(ros::NodeHandle h) : RComponent(h), nh_(h), pnh_("~"){
     component_name.assign(pnh_.getNamespace());    
     rosReadParams();
-    state_led = new_state_led = 0;
+    robot_mode = ROBOT_MODE::TYPES_ROBOT_MODE::NotLight;
+    new_robot_mode = ROBOT_MODE::TYPES_ROBOT_MODE::Ready;
     not_move_msg=0;
     elevator_moving = false;
 }
@@ -20,57 +21,104 @@ int robotnik_led_string::rosSetup(){
     client_led = nh_.serviceClient<robotnik_leds::leds_value>(service_led_name);
     direction = nh_.subscribe(topic_direction, 1, &robotnik_led_string::directionCallback, this);
     elevator = nh_.subscribe(topic_elevator, 1, &robotnik_led_string::elevatorAction, this);
+    estop = nh_.subscribe(topic_estop, 1, &robotnik_led_string::estopCallback, this);
+}
 
+bool isDrivingMode(ROBOT_MODE::TYPES_ROBOT_MODE mode)
+{
+    return mode == TYPES_ROBOT_MODE::FrontDriving or
+    mode ==  TYPES_ROBOT_MODE::FrontDriving or
+ mode ==        TYPES_ROBOT_MODE::BackDriving or
+mode ==         TYPES_ROBOT_MODE::FrontLeftDriving or
+mode ==         TYPES_ROBOT_MODE::FrontRightDriving or
+mode ==         TYPES_ROBOT_MODE::BackLeftDriving or
+mode ==         TYPES_ROBOT_MODE::BackRightDriving or
+mode ==         TYPES_ROBOT_MODE::LeftTurning or
+mode ==         TYPES_ROBOT_MODE::RightTurning or
+mode ==         TYPES_ROBOT_MODE::Turning;
 }
 
 void robotnik_led_string::timerPublish(const ros::TimerEvent& event){
     //rosPublish();
-    not_move_msg = (not_move_msg +1 ) % UINT16_MAX;
-    if(not_move_msg > 5){
-        new_state_led=TYPES_ROBOT_MODE::NotLight;
-    }
-    if (new_state_led != state_led){
-        leds_effects.clear();
-        //leds_effects.clear();
-        switch (new_state_led) {
-        case TYPES_ROBOT_MODE::NotLight:
+//    not_move_msg = (not_move_msg +1 ) % UINT16_MAX;
+//    if(not_move_msg > 5){
+//        new_robot_mode=TYPES_ROBOT_MODE::NotLight;
+//    }
 
+static ros::Time last_change_mode_stamp = ros::Time::now();
+
+
+//   if (isDrivingMode(robot_mode))
+//   {
+//      if (ros::Time::now() - last_direction_stamp > ros::Duration(1))
+//      {
+//          new_robot_mode = TYPES_ROBOT_MODE::Ready;
+//    RCOMPONENT_WARN_STREAM("Direction timeout");
+//         } 
+//   }
+    
+    RCOMPONENT_INFO_STREAM_THROTTLE(1, "Current mode " << robot_mode);
+    if (new_robot_mode != robot_mode and ros::Time::now() - last_change_mode_stamp > ros::Duration(1)){
+last_change_mode_stamp = ros::Time::now();
+        RCOMPONENT_INFO_STREAM("Switch mode from " << robot_mode << " to " << new_robot_mode);
+        leds_effects.clear();
+        switch (new_robot_mode) {
+        case TYPES_ROBOT_MODE::NotLight:
+            break;
+        case TYPES_ROBOT_MODE::Estop:
+                leds_effects.inserEffect(TYPE_PART::all, TYPE_LED_MODE::continous, TYPE_COLOR::red);
+break;
+        case TYPES_ROBOT_MODE::Ready:
+            if (battery_mode == ROBOT_MODE::TYPES_BATTERY::Charged)
+            {
+                leds_effects.inserEffect(TYPE_PART::all, TYPE_LED_MODE::continous, TYPE_COLOR::green);
+            }
+            else if (battery_mode == ROBOT_MODE::TYPES_BATTERY::Low)
+            {
+                leds_effects.inserEffect(TYPE_PART::all, TYPE_LED_MODE::continous, TYPE_COLOR::yellow);
+            }
             break;
         case TYPES_ROBOT_MODE::FrontDriving:
             leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous, TYPE_COLOR::red);
-            leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous, TYPE_COLOR::green);
+            //leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous, TYPE_COLOR::green);
+            leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous, TYPE_COLOR::black);
             leds_effects.inserEffect(TYPE_PART::left,TYPE_LED_MODE::continous, TYPE_COLOR::black);
             leds_effects.inserEffect(TYPE_PART::right, TYPE_LED_MODE::continous, TYPE_COLOR::black);
             break;
         case TYPES_ROBOT_MODE::BackDriving:
-            leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous, TYPE_COLOR::green);
+            //leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous, TYPE_COLOR::green);
+            leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous, TYPE_COLOR::black);
             leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous, TYPE_COLOR::red);
             leds_effects.inserEffect(TYPE_PART::left,TYPE_LED_MODE::continous, TYPE_COLOR::black);
             leds_effects.inserEffect(TYPE_PART::right, TYPE_LED_MODE::continous, TYPE_COLOR::black);
             break;
         case TYPES_ROBOT_MODE::FrontLeftDriving:
             leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous, TYPE_COLOR::red);
-            leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous, TYPE_COLOR::green);
+            //leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous, TYPE_COLOR::green);
+            leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous, TYPE_COLOR::black);
             leds_effects.inserEffect(TYPE_PART::left,TYPE_LED_MODE::blinking, TYPE_COLOR::yellow);
             leds_effects.inserEffect(TYPE_PART::right, TYPE_LED_MODE::continous, TYPE_COLOR::black);
             break;
         case TYPES_ROBOT_MODE::FrontRightDriving:
             leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous, TYPE_COLOR::red);
-            leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous, TYPE_COLOR::green);
+            //leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous, TYPE_COLOR::green);
+            leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous, TYPE_COLOR::black);
             leds_effects.inserEffect(TYPE_PART::left,TYPE_LED_MODE::continous, TYPE_COLOR::black);
             leds_effects.inserEffect(TYPE_PART::right, TYPE_LED_MODE::blinking, TYPE_COLOR::yellow);
             break;
         case TYPES_ROBOT_MODE::BackLeftDriving:
-            leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous, TYPE_COLOR::green);
-            leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous, TYPE_COLOR::red);
-            leds_effects.inserEffect(TYPE_PART::left,TYPE_LED_MODE::blinking, TYPE_COLOR::yellow);
-            leds_effects.inserEffect(TYPE_PART::right, TYPE_LED_MODE::continous, TYPE_COLOR::black);
-            break;
-        case TYPES_ROBOT_MODE::BackRightDriving:
-            leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous, TYPE_COLOR::green);
+            leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous, TYPE_COLOR::black);
+            //leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous, TYPE_COLOR::green);
             leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous, TYPE_COLOR::red);
             leds_effects.inserEffect(TYPE_PART::left,TYPE_LED_MODE::continous, TYPE_COLOR::black);
             leds_effects.inserEffect(TYPE_PART::right, TYPE_LED_MODE::blinking, TYPE_COLOR::yellow);
+            break;
+        case TYPES_ROBOT_MODE::BackRightDriving:
+            leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous, TYPE_COLOR::black);
+            //leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous, TYPE_COLOR::green);
+            leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous, TYPE_COLOR::red);
+            leds_effects.inserEffect(TYPE_PART::left,TYPE_LED_MODE::blinking, TYPE_COLOR::yellow);
+            leds_effects.inserEffect(TYPE_PART::right, TYPE_LED_MODE::continous, TYPE_COLOR::black);
             break;
 
         case TYPES_ROBOT_MODE::LeftTurning:
@@ -83,6 +131,12 @@ void robotnik_led_string::timerPublish(const ros::TimerEvent& event){
             leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous, TYPE_COLOR::black);
             leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous, TYPE_COLOR::black);
             leds_effects.inserEffect(TYPE_PART::left,TYPE_LED_MODE::continous, TYPE_COLOR::black);
+            leds_effects.inserEffect(TYPE_PART::right, TYPE_LED_MODE::blinking, TYPE_COLOR::yellow);
+            break;
+        case TYPES_ROBOT_MODE::Turning:
+            leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous, TYPE_COLOR::black);
+            leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous, TYPE_COLOR::black);
+            leds_effects.inserEffect(TYPE_PART::left,TYPE_LED_MODE::blinking, TYPE_COLOR::yellow);
             leds_effects.inserEffect(TYPE_PART::right, TYPE_LED_MODE::blinking, TYPE_COLOR::yellow);
             break;
         case TYPES_ROBOT_MODE::Lifting:
@@ -110,7 +164,7 @@ void robotnik_led_string::timerPublish(const ros::TimerEvent& event){
         default:
             break;
         }
-        state_led = new_state_led;
+        robot_mode = new_robot_mode;
 
     }
     vector <robotnik_leds::leds_value> send = leds_effects.paint();
@@ -120,59 +174,73 @@ void robotnik_led_string::timerPublish(const ros::TimerEvent& event){
     }
 }
 
-void robotnik_led_string::directionCallback (const geometry_msgs::Twist& msg){
+void robotnik_led_string::estopCallback (const std_msgs::Bool& msg){
+if (msg.data == true)
+new_robot_mode = TYPES_ROBOT_MODE::Estop;
+else if (robot_mode == TYPES_ROBOT_MODE::Estop)
+new_robot_mode = TYPES_ROBOT_MODE::Ready;
+}
 
-    if(elevator_moving){
+void robotnik_led_string::directionCallback (const geometry_msgs::Twist& msg){
+//    if (msg.linear.x == 0 and msg.angular.z == 0)
+//return;
+//
+//    last_direction_stamp = ros::Time::now();
+    if (robot_mode == TYPES_ROBOT_MODE::Lifting or robot_mode == TYPES_ROBOT_MODE::Lowering or robot_mode == TYPES_ROBOT_MODE::Estop or robot_mode == TYPES_ROBOT_MODE::NeedReset) {
         return;
     }
     if(abs(msg.linear.x)>min_value_activation_x){
         if (msg.linear.x<0){
                 if (msg.angular.z>min_value_activation_z){
-                    new_state_led=TYPES_ROBOT_MODE::BackRightDriving;
+                    new_robot_mode=TYPES_ROBOT_MODE::BackRightDriving;
                 }else if (abs(msg.angular.z)>min_value_activation_z){
-                    new_state_led=TYPES_ROBOT_MODE::BackLeftDriving;
+                    new_robot_mode=TYPES_ROBOT_MODE::BackLeftDriving;
                 }else{
-                    new_state_led=TYPES_ROBOT_MODE::BackDriving;
+                    new_robot_mode=TYPES_ROBOT_MODE::BackDriving;
                 }
         }else{
             if (msg.angular.z>min_value_activation_z){
-                new_state_led=TYPES_ROBOT_MODE::FrontRightDriving;
+                new_robot_mode=TYPES_ROBOT_MODE::FrontRightDriving;
             }else if (abs(msg.angular.z)>min_value_activation_z){
-                new_state_led=TYPES_ROBOT_MODE::FrontLeftDriving;
+                new_robot_mode=TYPES_ROBOT_MODE::FrontLeftDriving;
             }else{
-                new_state_led=TYPES_ROBOT_MODE::FrontDriving;
+                new_robot_mode=TYPES_ROBOT_MODE::FrontDriving;
             }
         }
     }
     else if(abs(msg.angular.z)>min_value_activation_z){
-        if(msg.angular.z<0){
-            new_state_led = TYPES_ROBOT_MODE::LeftTurning;
+        new_robot_mode = TYPES_ROBOT_MODE::Turning;
+        //if(msg.angular.z<0){
+        //    new_robot_mode = TYPES_ROBOT_MODE::LeftTurning;
+        //}else{
+        //    new_robot_mode = TYPES_ROBOT_MODE::RightTurning;
+        //}
+   }
+   else
+   {
+        new_robot_mode = TYPES_ROBOT_MODE::Ready;
 
-        }else{
-            new_state_led = TYPES_ROBOT_MODE::RightTurning;
-
-        }
-    }else{
-        new_state_led = TYPES_ROBOT_MODE::NotLight;
-    }
-    not_move_msg = 0;
+   }
 }
 
 void robotnik_led_string::elevatorAction (const robotnik_msgs::ElevatorStatus &msg){
-    if(msg.state != robotnik_msgs::ElevatorStatus::IDLE){
-        if(msg.state == robotnik_msgs::ElevatorStatus::LOWERING){
-            new_state_led = TYPES_ROBOT_MODE::Lowering;
-        }else if (msg.state == robotnik_msgs::ElevatorStatus::RAISING){
-            new_state_led = TYPES_ROBOT_MODE::Lifting;
-        }/*else{
+    last_elevator_stamp = ros::Time::now();
 
-        }*/
-        not_move_msg = 0;
-        elevator_moving = true;
-    }else{
-        elevator_moving = false;
-    }
-
+// this should be implemented, but as right now the leds seem a disco each time they are on...
+//   if (robot_mode == TYPES_ROBOT_MODE::Estop or robot_mode == TYPES_ROBOT_MODE::NeedReset) {
+//        return;
+//    }
+//   if (isDrivingMode(robot_mode))
+//    if(msg.state != robotnik_msgs::ElevatorStatus::IDLE){
+//        if(msg.state == robotnik_msgs::ElevatorStatus::LOWERING){
+//            new_robot_mode = TYPES_ROBOT_MODE::Lowering;
+//        }else if (msg.state == robotnik_msgs::ElevatorStatus::RAISING){
+//            new_robot_mode = TYPES_ROBOT_MODE::Lifting;
+//        }
+//    }
+//    else { 
+//      new_robot_mode = TYPES_ROBOT_MODE::Ready;
+//    }
 }
 
 int robotnik_led_string::rosShutdown(){
@@ -198,6 +266,7 @@ void robotnik_led_string::rosReadParams(){
 
     pnh_.param<string>("topic_direction", topic_direction, "robotnik_base_control/cmd_vel");
     pnh_.param<string>("topic_elevator", topic_elevator, "robotnik_base_control/elevator_status");
+    pnh_.param<string>("topic_estop", topic_estop, "robotnik_base_hw/emergency_stop");
     pnh_.param<float>("max_value_lineal_x", max_value_lineal_x, 1.0);
     pnh_.param<float>("max_value_lineal_y", max_value_lineal_y, 1.0);
     pnh_.param<float>("max_value_angular_z", max_value_angular_z, 3.0);

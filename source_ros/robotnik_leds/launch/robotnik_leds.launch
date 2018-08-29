@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-   <node name="robotnik_leds_hw" pkg="robotnik_leds" type="robotnik_leds_service" respawn="false" output="screen" />
+
+   <node name="robotnik_leds_driver" pkg="robotnik_leds" type="robotnik_leds_service" respawn="false" output="screen">
+      <param name="service_name" value="server_led_com" />
+      <param name="path_device" value="/dev/ttyUSB_LEDS" />
+   </node>
 
    <node name="robotnik_leds_control" pkg="robotnik_leds" type="robotnik_leds_node" respawn="false" output="screen">
-      <param name="service_name" value="robotnik_leds_hw/server_led_com" />
-      <param name="path_device" value="/dev/ttyUSB_LEDS" />
+      <param name="service_name" value="robotnik_leds_driver/server_led_com" />
       
       <param name="topic_direction" value="robotnik_base_control/cmd_vel" />
       <param name="topic_elevator" value="robotnik_base_control/elevator_status" />
+      <param name="topic_estop" value="robotnik_base_hw/emergency_stop" />
       
       <param name="max_value_lineal_x" value="0.5" />
       <param name="max_value_lineal_y" value="0.5" />
@@ -20,7 +24,7 @@
       <param name="led_start_front" value="125" />
       <param name="led_end_front" value="7" />
       <param name="led_start_right" value="89" />
-      <param name="led_end_right" value="114" />
+      <param name="led_end_right" value="129" />
       <param name="led_start_back" value="62" />
       <param name="led_end_back" value="79" />
       <param name="led_start_left" value="17" />

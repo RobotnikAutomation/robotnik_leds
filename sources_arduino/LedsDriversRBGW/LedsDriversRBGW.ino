@@ -103,6 +103,7 @@ boolean MenuReader(){
     if(stateACK!=ACK_OK){
       stateACK = ACK_OK;
       menStand = NONE;
+      Mensajes();
     }
     time = last_time = millis();
     int p, pend, paux1, paux2;
@@ -160,7 +161,7 @@ boolean MenuReader(){
         break;
      case 'k':
      case 'K':
-        Serial.println("k");
+        //Serial.println("k");
         //Type message ACK
         break;
      case 'a': //Change color to all leds

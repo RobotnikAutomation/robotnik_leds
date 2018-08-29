@@ -8,6 +8,7 @@
 #include <robotnik_leds/leds_value.h>
 #include <geometry_msgs/Twist.h>
 #include <robotnik_msgs/ElevatorStatus.h>
+#include <std_msgs/Bool.h>
 #include <string.h>
 
 using namespace std;
@@ -18,7 +19,7 @@ class robotnik_led_string : public rcomponent::RComponent
 private:
     LedsEffects leds_effects;
     float min_value_activation_x, min_value_activation_y, min_value_activation_z;
-    string topic_direction, topic_elevator;
+    string topic_direction, topic_elevator, topic_estop;
     string service_led_name;
 public:
   robotnik_led_string(ros::NodeHandle h);
@@ -67,15 +68,20 @@ protected:
   //Alarms
   ros::Timer timer;
   ros::ServiceClient client_led;
-  ros::Subscriber direction, elevator;
-
+  ros::Subscriber direction, elevator, estop;
+  ros::Time last_direction_stamp;
+  ros::Time last_elevator_stamp;
   void timerPublish(const ros::TimerEvent& event);
   void directionCallback (const geometry_msgs::Twist& msg);
   void elevatorAction (const robotnik_msgs::ElevatorStatus &msg);
+  void estopCallback(const std_msgs::Bool &msg);
 
-  int state_led, new_state_led, not_move_msg;
+  ROBOT_MODE::TYPES_ROBOT_MODE robot_mode, new_robot_mode;
+  ROBOT_MODE::TYPES_BATTERY battery_mode;
+  int not_move_msg;
   bool elevator_moving;
   bool bInitialized;
+  
 };
 
 #endif  // __ROBOTNIK_LEDS_

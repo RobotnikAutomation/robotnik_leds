@@ -36,9 +36,19 @@ namespace ROBOT_MODE
         BackRightDriving = 6,
         LeftTurning = 7,
         RightTurning = 8,
-        Lifting = 9,
-        Lowering = 10
+        Turning,
+        Lifting,
+        Lowering,
+        Ready,
+        Estop,
+        InMission,
+        NeedReset,
 	};
+        enum TYPES_BATTERY {
+        Charged,
+        Low,
+        Charging
+        };
 }
 typedef ROBOT_MODE::TYPES_ROBOT_MODE TYPES_ROBOT_MODE;
 

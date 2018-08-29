@@ -8,7 +8,7 @@
 #include <robotnik_leds/leds_value.h>
 #include <string.h>
 #include <unistd.h>
-
+#include <mutex>
 using namespace std;
 
 class robotnik_led_service : public rcomponent::RComponent
@@ -71,7 +71,7 @@ protected:
   ros::Timer timer;
   ros::ServiceServer service_led;
   SerialDevice * conexion;
-  
+  std::mutex serial_mutex;
   void messageACK();
   void timerPublish(const ros::TimerEvent& event);
   bool serviceMsg (robotnik_leds::leds_value::Request  &req, robotnik_leds::leds_value::Response &res);

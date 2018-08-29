@@ -211,8 +211,8 @@ void robotnik_led_service::rosReadParams(){
     ROS_WARN_STREAM("Read param");
     // RComponent::rosReadParams(); //not need to call it because it is called by the constructor of RComponent    
     //pnh_.param<std::string>("robot_base_frame", robot_base_frame_, "base_footprint");
-    nh_.param<string>("path_device", path_device, "/dev/ttyUSB0");
-    nh_.param<string>("service_name", service_led_name, "server_led_com");
+    pnh_.param<string>("path_device", path_device, "/dev/ttyUSB0");
+    pnh_.param<string>("service_name", service_led_name, "server_led_com");
     ROS_INFO_STREAM("Params:\n path_device - " + path_device + "\n service_name - "+service_led_name);
 
 }
