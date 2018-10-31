@@ -1,5 +1,5 @@
-#ifndef __ROBOTNIK_LEDS_RC_SERVICE_H_
-#define __ROBOTNIK_LEDS_RC_SERVICE_H_
+#ifndef __ROBOTNIK_LEDS_RC_DRIVER_H_
+#define __ROBOTNIK_LEDS_RC_DRIVER_H_
 
 #include <ros/ros.h>
 
@@ -11,11 +11,11 @@
 #include <mutex>
 using namespace std;
 
-class robotnik_led_service : public rcomponent::RComponent {
+class robotnik_leds_driver : public rcomponent::RComponent {
    private:
    public:
-    robotnik_led_service(ros::NodeHandle h);
-    virtual ~robotnik_led_service();
+    robotnik_leds_driver(ros::NodeHandle h);
+    virtual ~robotnik_leds_driver();
 
    protected:
     /* RComponent stuff */

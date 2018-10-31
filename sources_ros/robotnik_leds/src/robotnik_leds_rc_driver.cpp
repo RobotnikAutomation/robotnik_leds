@@ -1,6 +1,6 @@
-#include <robotnik_leds/robotnik_leds_rc_service.h>
+#include <robotnik_leds/robotnik_leds_rc_driver.h>
 
-robotnik_led_service::robotnik_led_service(ros::NodeHandle h)
+robotnik_leds_driver::robotnik_leds_driver(ros::NodeHandle h)
     : RComponent(h), nh_(h), pnh_("~") {
     component_name.assign(pnh_.getNamespace());
     conexion = NULL;
@@ -10,14 +10,14 @@ robotnik_led_service::robotnik_led_service(ros::NodeHandle h)
     sendMsg = false;
 }
 
-robotnik_led_service::~robotnik_led_service() {
+robotnik_leds_driver::~robotnik_leds_driver() {
     if (conexion != NULL) {
         sendMess("m6.");
         delete conexion;
     }
 }
 
-int robotnik_led_service::rosSetup() {
+int robotnik_leds_driver::rosSetup() {
     RComponent::rosSetup();
     // RobotStatService
     // =pnh_.advertiseService("get_robot_status",&robotnik_leds::get_robot_statusCB,this);
@@ -25,26 +25,26 @@ int robotnik_led_service::rosSetup() {
     // =pnh_.advertiseService("go_to",&robotnik_leds::go_toCB,this);
     ROS_WARN_STREAM("Service start");
     service_led = pnh_.advertiseService(
-        service_led_name, &robotnik_led_service::serviceMsg, this);
+        service_led_name, &robotnik_leds_driver::serviceMsg, this);
     timer = pnh_.createTimer(ros::Duration(1),
-                             &robotnik_led_service::timerPublish, this);
+                             &robotnik_leds_driver::timerPublish, this);
 }
 
-void robotnik_led_service::messageACK() {
+void robotnik_leds_driver::messageACK() {
     if (connected) {
         sendMess("k");
         // sendMess("m1.");
     }
 }
 
-void robotnik_led_service::timerPublish(const ros::TimerEvent &event) {
+void robotnik_leds_driver::timerPublish(const ros::TimerEvent &event) {
     if (!sendMsg) {
         messageACK();
     }
     // rosPublish();
 }
 
-bool robotnik_led_service::serviceMsg(
+bool robotnik_leds_driver::serviceMsg(
     robotnik_leds::leds_value::Request &req,
     robotnik_leds::leds_value::Response &res) {
     if (!connected) {
@@ -203,11 +203,11 @@ bool robotnik_led_service::serviceMsg(
     return true;
 }
 
-int robotnik_led_service::rosShutdown() { RComponent::rosShutdown(); }
+int robotnik_leds_driver::rosShutdown() { RComponent::rosShutdown(); }
 
-void robotnik_led_service::rosPublish() { RComponent::rosPublish(); }
+void robotnik_leds_driver::rosPublish() { RComponent::rosPublish(); }
 
-void robotnik_led_service::rosReadParams() {
+void robotnik_leds_driver::rosReadParams() {
     ROS_WARN_STREAM("Read param");
     // RComponent::rosReadParams(); //not need to call it because it is called
     // by the constructor of RComponent
@@ -219,7 +219,7 @@ void robotnik_led_service::rosReadParams() {
                     "\n service_name - " + service_led_name);
 }
 
-void robotnik_led_service::standbyState() {
+void robotnik_leds_driver::standbyState() {
     ROS_WARN_STREAM("Service in StandbyState");
 
     if (bInitialized)
@@ -228,7 +228,7 @@ void robotnik_led_service::standbyState() {
         switchToState(robotnik_msgs::State::INIT_STATE);
 }
 
-void robotnik_led_service::initState() {
+void robotnik_leds_driver::initState() {
     RComponent::initState();
     ROS_WARN_STREAM("InitState");
     conexion = new SerialDevice(path_device.c_str(), 9600, "none", 8);
@@ -254,13 +254,13 @@ void robotnik_led_service::initState() {
     switchToState(robotnik_msgs::State::READY_STATE);
 }
 
-void robotnik_led_service::allState() {}
+void robotnik_leds_driver::allState() {}
 
-void robotnik_led_service::readyState() {}
+void robotnik_leds_driver::readyState() {}
 
-void robotnik_led_service::emergencyState() {}
+void robotnik_leds_driver::emergencyState() {}
 
-void robotnik_led_service::failureState() {
+void robotnik_leds_driver::failureState() {
     if (try_connect > 10) {
         ROS_ERROR_STREAM(
             "ROBOTNIK_LED_SERVICE FATAL ERROR - It is impossible to connect "
@@ -274,7 +274,7 @@ void robotnik_led_service::failureState() {
     switchToState(robotnik_msgs::State::STANDBY_STATE);
 }
 
-bool robotnik_led_service::sendMess(char *c, int l) {
+bool robotnik_leds_driver::sendMess(char *c, int l) {
     if (conexion == NULL || !connected) {
         return false;
     }
@@ -287,7 +287,7 @@ bool robotnik_led_service::sendMess(char *c, int l) {
     }
 }
 
-bool robotnik_led_service::sendChar(char c) {
+bool robotnik_leds_driver::sendChar(char c) {
     if (conexion == NULL || !connected) {
         return false;
     }
@@ -299,7 +299,7 @@ bool robotnik_led_service::sendChar(char c) {
     }
 }
 
-bool robotnik_led_service::sendMess(string c) {
+bool robotnik_leds_driver::sendMess(string c) {
     if (conexion == NULL || !connected) {
         return false;
     }
@@ -314,7 +314,7 @@ bool robotnik_led_service::sendMess(string c) {
     }
 }
 
-bool robotnik_led_service::sendNum(int n) {
+bool robotnik_leds_driver::sendNum(int n) {
     if (conexion == NULL || !connected) {
         return false;
     }

@@ -1,6 +1,6 @@
-#include <robotnik_leds/robotnik_leds_rc_node.h>
+#include <robotnik_leds/robotnik_leds_rc_control.h>
 
-robotnik_led_string::robotnik_led_string(ros::NodeHandle h)
+robotnik_leds_control::robotnik_leds_control(ros::NodeHandle h)
     : RComponent(h), nh_(h), pnh_("~") {
     component_name.assign(pnh_.getNamespace());
     rosReadParams();
@@ -10,9 +10,9 @@ robotnik_led_string::robotnik_led_string(ros::NodeHandle h)
     elevator_moving = false;
 }
 
-robotnik_led_string::~robotnik_led_string() {}
+robotnik_leds_control::~robotnik_leds_control() {}
 
-int robotnik_led_string::rosSetup() {
+int robotnik_leds_control::rosSetup() {
     RComponent::rosSetup();
     // RobotStatService
     // =pnh_.advertiseService("get_robot_status",&robotnik_leds::get_robot_statusCB,this);
@@ -20,13 +20,13 @@ int robotnik_led_string::rosSetup() {
     // =pnh_.advertiseService("go_to",&robotnik_leds::go_toCB,this);
 
     timer = pnh_.createTimer(ros::Duration(0.00001),
-                             &robotnik_led_string::timerPublish, this);
+                             &robotnik_leds_control::timerPublish, this);
     client_led = nh_.serviceClient<robotnik_leds::leds_value>(service_led_name);
     direction = nh_.subscribe(topic_direction, 1,
-                              &robotnik_led_string::directionCallback, this);
+                              &robotnik_leds_control::directionCallback, this);
     elevator = nh_.subscribe(topic_elevator, 1,
-                             &robotnik_led_string::elevatorAction, this);
-    estop = nh_.subscribe(topic_estop, 1, &robotnik_led_string::estopCallback,
+                             &robotnik_leds_control::elevatorAction, this);
+    estop = nh_.subscribe(topic_estop, 1, &robotnik_leds_control::estopCallback,
                           this);
 }
 
@@ -43,7 +43,7 @@ bool isDrivingMode(ROBOT_MODE::TYPES_ROBOT_MODE mode) {
            mode == TYPES_ROBOT_MODE::Turning;
 }
 
-void robotnik_led_string::timerPublish(const ros::TimerEvent& event) {
+void robotnik_leds_control::timerPublish(const ros::TimerEvent& event) {
     // rosPublish();
     //    not_move_msg = (not_move_msg +1 ) % UINT16_MAX;
     //    if(not_move_msg > 5){
@@ -266,14 +266,14 @@ void robotnik_led_string::timerPublish(const ros::TimerEvent& event) {
     }
 }
 
-void robotnik_led_string::estopCallback(const std_msgs::Bool& msg) {
+void robotnik_leds_control::estopCallback(const std_msgs::Bool& msg) {
     if (msg.data == true)
         new_robot_mode = TYPES_ROBOT_MODE::Estop;
     else if (robot_mode == TYPES_ROBOT_MODE::Estop)
         new_robot_mode = TYPES_ROBOT_MODE::Ready;
 }
 
-void robotnik_led_string::directionCallback(const geometry_msgs::Twist& msg) {
+void robotnik_leds_control::directionCallback(const geometry_msgs::Twist& msg) {
     //    if (msg.linear.x == 0 and msg.angular.z == 0)
     // return;
     //
@@ -314,7 +314,7 @@ void robotnik_led_string::directionCallback(const geometry_msgs::Twist& msg) {
     }
 }
 
-void robotnik_led_string::elevatorAction(
+void robotnik_leds_control::elevatorAction(
     const robotnik_msgs::ElevatorStatus& msg) {
     last_elevator_stamp = ros::Time::now();
 
@@ -337,11 +337,11 @@ void robotnik_led_string::elevatorAction(
     //    }
 }
 
-int robotnik_led_string::rosShutdown() { RComponent::rosShutdown(); }
+int robotnik_leds_control::rosShutdown() { RComponent::rosShutdown(); }
 
-void robotnik_led_string::rosPublish() { RComponent::rosPublish(); }
+void robotnik_leds_control::rosPublish() { RComponent::rosPublish(); }
 
-void robotnik_led_string::rosReadParams() {
+void robotnik_leds_control::rosReadParams() {
     // RComponent::rosReadParams(); //not need to call it because it is called
     // by the constructor of RComponent
     // pnh_.param<std::string>("robot_base_frame", robot_base_frame_,
@@ -447,14 +447,14 @@ void robotnik_led_string::rosReadParams() {
     // leds_effects.disableAllEffect();
 }
 
-void robotnik_led_string::standbyState() {
+void robotnik_leds_control::standbyState() {
     if (bInitialized)
         switchToState(robotnik_msgs::State::READY_STATE);
     else
         switchToState(robotnik_msgs::State::INIT_STATE);
 }
 
-void robotnik_led_string::initState() {
+void robotnik_leds_control::initState() {
     // OPEN PORT ......
     RComponent::initState();
     // leds_effects.inserEffect(TYPE_LED_MODE.blinking, TYPE_PART.all,
@@ -463,10 +463,10 @@ void robotnik_led_string::initState() {
     switchToState(robotnik_msgs::State::READY_STATE);
 }
 
-void robotnik_led_string::allState() {}
+void robotnik_leds_control::allState() {}
 
-void robotnik_led_string::readyState() {}
+void robotnik_leds_control::readyState() {}
 
-void robotnik_led_string::emergencyState() {}
+void robotnik_leds_control::emergencyState() {}
 
-void robotnik_led_string::failureState() {}
+void robotnik_leds_control::failureState() {}

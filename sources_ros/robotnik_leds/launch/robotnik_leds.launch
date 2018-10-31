@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
 
-   <node name="robotnik_leds_driver" pkg="robotnik_leds" type="robotnik_leds_service" respawn="false" output="screen">
+   <node name="robotnik_leds_driver" pkg="robotnik_leds" type="robotnik_leds_driver" respawn="false" output="screen">
       <param name="service_name" value="server_led_com" />
       <param name="path_device" value="/dev/ttyUSB_LEDS" />
    </node>
 
-   <node name="robotnik_leds_control" pkg="robotnik_leds" type="robotnik_leds_node" respawn="false" output="screen">
+   <node name="robotnik_leds_control" pkg="robotnik_leds" type="robotnik_leds_control" respawn="false" output="screen">
       <param name="service_name" value="robotnik_leds_driver/server_led_com" />
       
       <param name="topic_direction" value="robotnik_base_control/cmd_vel" />

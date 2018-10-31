@@ -1,5 +1,5 @@
-#ifndef __ROBOTNIK_LEDS_RC_NODE_H_
-#define __ROBOTNIK_LEDS_RC_NODE_H_
+#ifndef __ROBOTNIK_LEDS_RC_CONTROL_H_
+#define __ROBOTNIK_LEDS_RC_CONTROL_H_
 
 #include <ros/ros.h>
 
@@ -13,7 +13,7 @@
 
 using namespace std;
 
-class robotnik_led_string : public rcomponent::RComponent {
+class robotnik_leds_control : public rcomponent::RComponent {
    private:
     LedsEffects leds_effects;
     float min_value_activation_x, min_value_activation_y,
@@ -22,8 +22,8 @@ class robotnik_led_string : public rcomponent::RComponent {
     string service_led_name;
 
    public:
-    robotnik_led_string(ros::NodeHandle h);
-    virtual ~robotnik_led_string();
+    robotnik_leds_control(ros::NodeHandle h);
+    virtual ~robotnik_leds_control();
 
    protected:
     /* RComponent stuff */

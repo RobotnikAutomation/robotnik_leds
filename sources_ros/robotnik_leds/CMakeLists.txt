@@ -38,13 +38,13 @@ include_directories(
 )
 
 ## Declare a C++ executable
-add_executable(robotnik_leds_node
-                    src/robotnik_leds_node.cpp
-                    src/robotnik_leds_rc_node.cpp
+add_executable(robotnik_leds_control
+                    src/robotnik_leds_control.cpp
+                    src/robotnik_leds_rc_control.cpp
                     src/leds_effects.cpp
                     src/color.cpp
                     src/leds_part.cpp
-                    include/robotnik_leds/robotnik_leds_rc_node.h
+                    include/robotnik_leds/robotnik_leds_rc_control.h
                     include/robotnik_leds/color.h
                     include/robotnik_leds/led_mode.h
                     include/robotnik_leds/part.h
@@ -53,11 +53,11 @@ add_executable(robotnik_leds_node
 
 )
 
-add_executable(robotnik_leds_service
-                    src/robotnik_leds_service.cpp
-                    src/robotnik_leds_rc_service.cpp
+add_executable(robotnik_leds_driver
+                    src/robotnik_leds_driver.cpp
+                    src/robotnik_leds_rc_driver.cpp
                     src/SerialDevice.cc
-                    include/robotnik_leds/robotnik_leds_rc_service.h
+                    include/robotnik_leds/robotnik_leds_rc_driver.h
                     include/robotnik_leds/SerialDevice.h
 
 )
@@ -65,20 +65,20 @@ add_executable(robotnik_leds_service
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(robotnik_leds_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+add_dependencies(robotnik_leds_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
                  robotnik_msgs_generate_messages_cpp)
 
-add_dependencies(robotnik_leds_service ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
+add_dependencies(robotnik_leds_driver ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS}
                  robotnik_msgs_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(
-  robotnik_leds_node
+  robotnik_leds_control
   ${catkin_LIBRARIES}
 )
 
 target_link_libraries(
-  robotnik_leds_service
+  robotnik_leds_driver
   ${catkin_LIBRARIES}
 )
 
