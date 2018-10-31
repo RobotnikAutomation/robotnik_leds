@@ -2,12 +2,12 @@
 #define _LEDS_PART_H__
 
 #include <robotnik_leds/color.h>
-#include <robotnik_leds/part.h>
 #include <robotnik_leds/led_mode.h>
+#include <robotnik_leds/part.h>
 
 using namespace std;
 
-class LedsPart{
+class LedsPart {
     TYPE_PART part;
     int led_start;
     int led_end;
@@ -18,10 +18,18 @@ class LedsPart{
     bool endable;
     bool painted;
 
-public:
-    LedsPart(TYPE_PART _part, int _led_start, int _led_end, TYPE_LED_MODE _mode = TYPE_LED_MODE::continous,TYPE_COLOR _color1= TYPE_COLOR::white, TYPE_COLOR _color2=TYPE_COLOR::white, TYPE_COLOR _color3=TYPE_COLOR::white);
-    LedsPart(TYPE_PART _part, int _led_start, int _led_end,  TYPE_LED_MODE _mode = TYPE_LED_MODE::continous,Color _color1 = Color(TYPE_COLOR::white), Color _color2= Color(TYPE_COLOR::white), Color _color3= Color(TYPE_COLOR::white));
-    TYPE_PART getPart ();
+   public:
+    LedsPart(TYPE_PART _part, int _led_start, int _led_end,
+             TYPE_LED_MODE _mode = TYPE_LED_MODE::continous,
+             TYPE_COLOR _color1 = TYPE_COLOR::white,
+             TYPE_COLOR _color2 = TYPE_COLOR::white,
+             TYPE_COLOR _color3 = TYPE_COLOR::white);
+    LedsPart(TYPE_PART _part, int _led_start, int _led_end,
+             TYPE_LED_MODE _mode = TYPE_LED_MODE::continous,
+             Color _color1 = Color(TYPE_COLOR::white),
+             Color _color2 = Color(TYPE_COLOR::white),
+             Color _color3 = Color(TYPE_COLOR::white));
+    TYPE_PART getPart();
     TYPE_LED_MODE getMode();
     int getLedStart();
     int getLedEnd();
@@ -39,7 +47,6 @@ public:
     void setPainted(bool _painted);
     void setEndable(bool _endable);
     bool getEndable();
-
 };
 
-#endif //_LEDS_PART_H__
+#endif  //_LEDS_PART_H__
