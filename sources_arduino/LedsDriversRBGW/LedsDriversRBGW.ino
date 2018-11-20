@@ -26,10 +26,12 @@ int menStand;
 #define OKI 4
 #define WAIT 5
 #define WAITI 6
+#define INIT 7
 
 
 boolean intermitente;
 boolean mensajenuevo;
+boolean useack;
 int leds;
 
 int stateACK;
@@ -51,15 +53,18 @@ void setup (){
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
   intermitente = true;
-  menStand = NONE;
+  menStand = WAITI;
   stateACK = 0;
+  useack=false;
   time = last_time = millis();
 }
 
 void loop(){
   MenuReader();
   Mensajes();
-  ACKState();
+  /*if(useack){
+    ACKState();
+  }*/
 }
 
 char CharReadingWait (){
@@ -100,15 +105,15 @@ int IntReadingWaitAtoi (){
 //Menu reader
 boolean MenuReader(){
   if(Serial.available()>0){
-    if(stateACK!=ACK_OK){
+    /*if(stateACK!=ACK_OK && useack){
       stateACK = ACK_OK;
       menStand = NONE;
-      Mensajes();
-    }
+    }*/
     time = last_time = millis();
     int p, pend, paux1, paux2;
     int r, g, b, w;
     boolean jump;
+    useack=true;
     switch (Serial.read()){
       case 'i': //Get information about number of leds
       case 'I':
@@ -161,7 +166,7 @@ boolean MenuReader(){
         break;
      case 'k':
      case 'K':
-        //Serial.println("k");
+        Serial.println("k");
         //Type message ACK
         break;
      case 'a': //Change color to all leds
@@ -202,10 +207,17 @@ boolean MenuReader(){
          case WAITI:  //Blinking Blue
            menStand = WAITI;
            break;
+         case INIT:
+           menStand = INIT;
+           break;
          
        }
        mensajenuevo = true;
        break;
+     case 'q':
+     case 'Q':
+       useack=false;
+       break;          
     }
     Serial.flush();
     return true;  
@@ -238,6 +250,7 @@ void colorWipe(uint32_t c, int pfirst, int pend) {
 
 //ACK state
 void ACKState(){
+  
   if(stateACK!=ACK_WAIT){
     time = millis();
     if((time-last_time)>TIMER_ERROR_ACK){
@@ -258,10 +271,11 @@ void ACKState(){
 void Mensajes(){
   switch(menStand){
          case NONE:
-           if(mensajenuevo){
+           None();
+           /*if(mensajenuevo){
              None();
              mensajenuevo = false;
-           }
+           }*/
            break;
          case ERR:
            Error();
@@ -280,6 +294,9 @@ void Mensajes(){
            break;
          case WAITI:
            WaitI();
+           break;
+         case INIT:
+           Init();           
            break;
        }
 }
@@ -319,7 +336,7 @@ void OkI(){
   delay(500);
 }
 
-void Wait(){
+void Wait(){  
   colorWipe(BLUE, 0, leds);
 }
 
@@ -332,4 +349,10 @@ void WaitI(){
   }
   intermitente = !intermitente;
   delay(500);
+}
+
+void Init(){
+  colorWipe(WHITE, 0, leds);
+  strip.show();
+
 }
