@@ -9,16 +9,16 @@
    <node name="robotnik_leds_control" pkg="robotnik_leds" type="robotnik_leds_control" respawn="false" output="screen">
       <param name="service_name" value="robotnik_leds_driver/server_led_com" />
       
-      <param name="topic_direction" value="robotnik_base_control/cmd_vel" />
-      <param name="topic_elevator" value="robotnik_base_control/elevator_status" />
-      <param name="topic_estop" value="robotnik_base_hw/emergency_stop" />
+      <param name="topic_direction" value="/rb2/robotnik_base_control/cmd_vel" />
+      <param name="topic_elevator" value="/rb2/robotnik_base_control/elevator_status" />
+      <param name="topic_estop" value="/rb2/robotnik_base_hw/emergency_stop" />
       
-      <param name="max_value_lineal_x" value="0.5" />
-      <param name="max_value_lineal_y" value="0.5" />
-      <param name="max_value_angular_z" value="0.5" />
-      <param name="porc_min_linear_x" value="0.01" />
-      <param name="porc_min_linear_y" value="0.03" />
-      <param name="porc_min_angular_z" value="0.1" />
+      <param name="max_value_lineal_x" value="1.0" />
+      <param name="max_value_lineal_y" value="1.0" />
+      <param name="max_value_angular_z" value="1.0" />
+      <param name="porc_min_linear_x" value="0.0" />
+      <param name="porc_min_linear_y" value="0.0" />
+      <param name="porc_min_angular_z" value="0.0" />
       
       <param name="leds" value="134" />
       <param name="led_start_front" value="125" />

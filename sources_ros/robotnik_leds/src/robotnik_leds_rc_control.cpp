@@ -63,7 +63,7 @@ void robotnik_leds_control::timerPublish(const ros::TimerEvent& event) {
 
     RCOMPONENT_INFO_STREAM_THROTTLE(1, "Current mode " << robot_mode);
     if (new_robot_mode != robot_mode and
-        ros::Time::now() - last_change_mode_stamp > ros::Duration(1)) {
+        ros::Time::now() - last_change_mode_stamp > ros::Duration(3)) {
         last_change_mode_stamp = ros::Time::now();
         RCOMPONENT_INFO_STREAM("Switch mode from " << robot_mode << " to "
                                                    << new_robot_mode);
@@ -87,14 +87,14 @@ void robotnik_leds_control::timerPublish(const ros::TimerEvent& event) {
                 }
                 break;
             case TYPES_ROBOT_MODE::FrontDriving:
-                leds_effects.inserEffect(TYPE_PART::front,
-                                         TYPE_LED_MODE::continous,
-                                         TYPE_COLOR::red);
+                //leds_effects.inserEffect(TYPE_PART::front,
+                //                         TYPE_LED_MODE::continous,
+                //                         TYPE_COLOR::white);
                 // leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous,
                 // TYPE_COLOR::green);
                 leds_effects.inserEffect(TYPE_PART::back,
                                          TYPE_LED_MODE::continous,
-                                         TYPE_COLOR::black);
+                                         TYPE_COLOR::red);
                 leds_effects.inserEffect(TYPE_PART::left,
                                          TYPE_LED_MODE::continous,
                                          TYPE_COLOR::black);
@@ -107,9 +107,9 @@ void robotnik_leds_control::timerPublish(const ros::TimerEvent& event) {
                 // TYPE_COLOR::green);
                 leds_effects.inserEffect(TYPE_PART::front,
                                          TYPE_LED_MODE::continous,
-                                         TYPE_COLOR::black);
-                leds_effects.inserEffect(
-                    TYPE_PART::back, TYPE_LED_MODE::continous, TYPE_COLOR::red);
+                                         TYPE_COLOR::red);
+                //leds_effects.inserEffect(
+                //    TYPE_PART::back, TYPE_LED_MODE::continous, TYPE_COLOR::white);
                 leds_effects.inserEffect(TYPE_PART::left,
                                          TYPE_LED_MODE::continous,
                                          TYPE_COLOR::black);
@@ -118,14 +118,14 @@ void robotnik_leds_control::timerPublish(const ros::TimerEvent& event) {
                                          TYPE_COLOR::black);
                 break;
             case TYPES_ROBOT_MODE::FrontLeftDriving:
-                leds_effects.inserEffect(TYPE_PART::front,
-                                         TYPE_LED_MODE::continous,
-                                         TYPE_COLOR::red);
+                //leds_effects.inserEffect(TYPE_PART::front,
+                //                         TYPE_LED_MODE::continous,
+                //                         TYPE_COLOR::white);
                 // leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous,
                 // TYPE_COLOR::green);
                 leds_effects.inserEffect(TYPE_PART::back,
                                          TYPE_LED_MODE::continous,
-                                         TYPE_COLOR::black);
+                                         TYPE_COLOR::red);
                 leds_effects.inserEffect(TYPE_PART::left,
                                          TYPE_LED_MODE::blinking,
                                          TYPE_COLOR::yellow);
@@ -134,14 +134,14 @@ void robotnik_leds_control::timerPublish(const ros::TimerEvent& event) {
                                          TYPE_COLOR::black);
                 break;
             case TYPES_ROBOT_MODE::FrontRightDriving:
-                leds_effects.inserEffect(TYPE_PART::front,
-                                         TYPE_LED_MODE::continous,
-                                         TYPE_COLOR::red);
+                //leds_effects.inserEffect(TYPE_PART::front,
+                //                         TYPE_LED_MODE::continous,
+                //                         TYPE_COLOR::white);
                 // leds_effects.inserEffect(TYPE_PART::back,TYPE_LED_MODE::continous,
                 // TYPE_COLOR::green);
                 leds_effects.inserEffect(TYPE_PART::back,
                                          TYPE_LED_MODE::continous,
-                                         TYPE_COLOR::black);
+                                         TYPE_COLOR::red);
                 leds_effects.inserEffect(TYPE_PART::left,
                                          TYPE_LED_MODE::continous,
                                          TYPE_COLOR::black);
@@ -152,11 +152,11 @@ void robotnik_leds_control::timerPublish(const ros::TimerEvent& event) {
             case TYPES_ROBOT_MODE::BackLeftDriving:
                 leds_effects.inserEffect(TYPE_PART::front,
                                          TYPE_LED_MODE::continous,
-                                         TYPE_COLOR::black);
+                                         TYPE_COLOR::red);
                 // leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous,
                 // TYPE_COLOR::green);
                 leds_effects.inserEffect(
-                    TYPE_PART::back, TYPE_LED_MODE::continous, TYPE_COLOR::red);
+                    TYPE_PART::back, TYPE_LED_MODE::continous, TYPE_COLOR::white);
                 leds_effects.inserEffect(TYPE_PART::left,
                                          TYPE_LED_MODE::continous,
                                          TYPE_COLOR::black);
@@ -167,11 +167,11 @@ void robotnik_leds_control::timerPublish(const ros::TimerEvent& event) {
             case TYPES_ROBOT_MODE::BackRightDriving:
                 leds_effects.inserEffect(TYPE_PART::front,
                                          TYPE_LED_MODE::continous,
-                                         TYPE_COLOR::black);
+                                         TYPE_COLOR::red);
                 // leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::continous,
                 // TYPE_COLOR::green);
                 leds_effects.inserEffect(
-                    TYPE_PART::back, TYPE_LED_MODE::continous, TYPE_COLOR::red);
+                    TYPE_PART::back, TYPE_LED_MODE::continous, TYPE_COLOR::white);
                 leds_effects.inserEffect(TYPE_PART::left,
                                          TYPE_LED_MODE::blinking,
                                          TYPE_COLOR::yellow);
@@ -225,7 +225,7 @@ void robotnik_leds_control::timerPublish(const ros::TimerEvent& event) {
             case TYPES_ROBOT_MODE::Lifting:
                 leds_effects.inserEffect(TYPE_PART::all,
                                          TYPE_LED_MODE::blinking,
-                                         TYPE_COLOR::black, TYPE_COLOR::green);
+                                         TYPE_COLOR::black, TYPE_COLOR::orange);
                 /*
                 leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::roundInv,
                 TYPE_COLOR::white);
@@ -241,7 +241,7 @@ void robotnik_leds_control::timerPublish(const ros::TimerEvent& event) {
             case TYPES_ROBOT_MODE::Lowering:
                 leds_effects.inserEffect(TYPE_PART::all,
                                          TYPE_LED_MODE::blinking,
-                                         TYPE_COLOR::black, TYPE_COLOR::red);
+                                         TYPE_COLOR::black, TYPE_COLOR::orange);
                 /*
                 leds_effects.inserEffect(TYPE_PART::front,TYPE_LED_MODE::roundInv,
                 TYPE_COLOR::white);
@@ -287,17 +287,17 @@ void robotnik_leds_control::directionCallback(const geometry_msgs::Twist& msg) {
     if (abs(msg.linear.x) > min_value_activation_x) {
         if (msg.linear.x < 0) {
             if (msg.angular.z > min_value_activation_z) {
-                new_robot_mode = TYPES_ROBOT_MODE::BackRightDriving;
+                new_robot_mode = TYPES_ROBOT_MODE::BackDriving;
             } else if (abs(msg.angular.z) > min_value_activation_z) {
-                new_robot_mode = TYPES_ROBOT_MODE::BackLeftDriving;
+                new_robot_mode = TYPES_ROBOT_MODE::BackDriving;
             } else {
                 new_robot_mode = TYPES_ROBOT_MODE::BackDriving;
             }
         } else {
             if (msg.angular.z > min_value_activation_z) {
-                new_robot_mode = TYPES_ROBOT_MODE::FrontRightDriving;
+                new_robot_mode = TYPES_ROBOT_MODE::FrontDriving;
             } else if (abs(msg.angular.z) > min_value_activation_z) {
-                new_robot_mode = TYPES_ROBOT_MODE::FrontLeftDriving;
+                new_robot_mode = TYPES_ROBOT_MODE::FrontDriving;
             } else {
                 new_robot_mode = TYPES_ROBOT_MODE::FrontDriving;
             }
@@ -367,9 +367,9 @@ void robotnik_leds_control::rosReadParams() {
     pnh_.param<float>("porc_min_linear_x", porc_min_linear_x, 0.01);
     pnh_.param<float>("porc_min_linear_y", porc_min_linear_y, 0.25);
     pnh_.param<float>("porc_min_angular_z", porc_min_angular_z, 0.25);
-    min_value_activation_x = 0;  // max_value_lineal_x * porc_min_linear_x;
-    min_value_activation_y = 0;  // max_value_lineal_y * porc_min_linear_y;
-    min_value_activation_z = 0;  // max_value_angular_z * porc_min_angular_z;
+    min_value_activation_x = max_value_lineal_x * porc_min_linear_x;
+    min_value_activation_y = max_value_lineal_y * porc_min_linear_y;
+    min_value_activation_z = max_value_angular_z * porc_min_angular_z;
 
     pnh_.param<int>("leds", leds, 120);
     leds_effects = LedsEffects(leds, 5);

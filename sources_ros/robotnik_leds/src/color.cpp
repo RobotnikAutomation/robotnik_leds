@@ -41,6 +41,7 @@ void Color::setColor(TYPE_COLOR tc) {
         case TYPE_COLOR::yellow:
             setYellow();
             break;
+	
     }
 }
 
@@ -79,3 +80,5 @@ void Color::setYellow() {
     g = 255;
     b = 0;
 }
+
+

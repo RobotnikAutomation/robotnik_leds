@@ -67,6 +67,7 @@ protected:
   ros::Subscriber direction, elevator, estop;
   ros::Time last_direction_stamp;
   ros::Time last_elevator_stamp;
+  ros::Time last_ready_stamp;
   void timerPublish(const ros::TimerEvent& event);
   void directionCallback(const geometry_msgs::Twist& msg);
   void elevatorAction(const robotnik_msgs::ElevatorStatus& msg);
